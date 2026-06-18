@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+}
+
+a, button {
+  min-height: 44px;
+}
+
+:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+html.alto-contraste {
+  background: #000 !important;
+}
+html.alto-contraste body {
+  background: #000 !important;
+  color: #fff !important;
+}
+html.alto-contraste a {
+  color: #ffeb3b !important;
+}
+html.alto-contraste .bg-white,
+html.alto-contraste .bg-gray-50,
+html.alto-contraste .bg-blue-50 {
+  background: #111 !important;
+  color: #fff !important;
+}
