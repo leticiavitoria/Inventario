@@ -1,16 +1,19 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { catalogoDocs } from "@/data/documentos";
 import { getHerdeiro } from "@/data/herdeiros";
 import { AppIconBadge } from "@/components/AppIcon";
 import { MarcarFeito } from "@/components/MarcarFeito";
 import { ChatGPTAjuda } from "@/components/ChatGPTAjuda";
+import { FormattedText } from "@/components/FormattedText";
 
 export default function DocPage() {
-  const params = useParams();
-  const slug = String(params.slug);
-  const docId = String(params.docId);
+  const { slug: slugParam, docId: docIdParam } = useParams();
+  const sp = useSearchParams();
+  const slug = String(slugParam);
+  const docId = String(docIdParam);
+  const itemId = sp.get("item") ?? docId;
   const h = getHerdeiro(slug);
   const doc = catalogoDocs[docId];
 
@@ -24,12 +27,12 @@ export default function DocPage() {
 
       <header>
         <h1 className="text-xl font-bold text-blue-900">{doc.nome}</h1>
-        <p className="text-sm text-gray-700 mt-1">{doc.descricao}</p>
+        {doc.descricao && <p className="text-sm text-gray-700 mt-1">{doc.descricao}</p>}
       </header>
 
       {doc.iconesApps && doc.iconesApps.length > 0 && (
         <section className="rounded-lg border border-gray-300 bg-white p-3">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Aplicativos que você vai usar:</p>
+          <p className="text-xs font-semibold text-gray-700 mb-2">Onde fazer:</p>
           <div className="flex flex-wrap gap-2">
             {doc.iconesApps.map((ic) => <AppIconBadge key={ic} icon={ic} />)}
           </div>
@@ -39,8 +42,8 @@ export default function DocPage() {
       {doc.avisos.length > 0 && (
         <section className="rounded-lg border-2 border-amber-500 bg-amber-50 p-3">
           <p className="font-bold text-amber-900 text-sm mb-2">⚠️ Atenção:</p>
-          <ul className="list-disc pl-5 space-y-1 text-sm text-amber-900">
-            {doc.avisos.map((a, i) => <li key={i}>{a}</li>)}
+          <ul className="list-disc pl-5 space-y-1.5 text-sm text-amber-900">
+            {doc.avisos.map((a, i) => <li key={i}><FormattedText text={a} /></li>)}
           </ul>
         </section>
       )}
@@ -48,7 +51,7 @@ export default function DocPage() {
       <section className="rounded-lg border border-gray-300 bg-white p-3">
         <p className="font-bold text-gray-900 text-sm mb-2">Como conseguir:</p>
         <ol className="list-decimal pl-5 space-y-1.5 text-sm text-gray-800">
-          {doc.comoConseguir.map((p, i) => <li key={i}>{p}</li>)}
+          {doc.comoConseguir.map((p, i) => <li key={i}><FormattedText text={p} /></li>)}
         </ol>
       </section>
 
@@ -70,11 +73,22 @@ export default function DocPage() {
           rel="noopener"
           className="flex items-center justify-center gap-2 rounded-lg bg-green-700 hover:bg-green-800 text-white font-bold py-3 text-sm"
         >
-          ⬇ Baixar modelo para imprimir — toque aqui →
+          ⬇ Baixar modelo (depois imprima na papelaria) →
         </a>
       )}
 
-      <MarcarFeito slug={slug} docId={docId} />
+      <section className="rounded-lg border-2 border-blue-500 bg-blue-50 p-3">
+        <p className="font-bold text-blue-900 text-sm mb-1">Última checagem:</p>
+        <p className="text-sm text-blue-900">
+          Você consegue <b>ler o documento impresso com facilidade</b>?
+        </p>
+        <p className="text-xs text-blue-900 mt-1">
+          ✅ Se SIM: ok, pode marcar como feito.<br/>
+          ❌ Se NÃO: jogue fora e faça outro. Documento ilegível não vale.
+        </p>
+      </section>
+
+      <MarcarFeito slug={slug} itemId={itemId} />
 
       <ChatGPTAjuda contextoDoc={doc.nome} />
     </div>

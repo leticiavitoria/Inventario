@@ -7,6 +7,7 @@ const config: Record<AppIcon, { label: string; bg: string; emoji: string; cdn?: 
   googledrive: { label: "Google Drive", bg: "bg-white border border-gray-300", emoji: "", cdn: "https://cdn.simpleicons.org/googledrive" },
   whatsapp: { label: "WhatsApp", bg: "bg-green-500 text-white", emoji: "", cdn: "https://cdn.simpleicons.org/whatsapp/ffffff" },
   youtube: { label: "YouTube", bg: "bg-red-600 text-white", emoji: "", cdn: "https://cdn.simpleicons.org/youtube/ffffff" },
+  papelaria: { label: "Papelaria perto de casa", bg: "bg-emerald-600 text-white", emoji: "🖨️" },
 };
 
 export function AppIconBadge({ icon }: { icon: AppIcon }) {

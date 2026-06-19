@@ -7,15 +7,17 @@ import { StatusBadge } from "./StatusBadge";
 
 type Props = {
   slug: string;
-  docId: string;
+  itemId: string;
+  catalogoId: string;
+  nomeOverride?: string;
   status: StatusDoc;
   observacao?: string;
 };
 
-export function DocItem({ slug, docId, status, observacao }: Props) {
-  const doc = catalogoDocs[docId];
+export function DocItem({ slug, itemId, catalogoId, nomeOverride, status, observacao }: Props) {
+  const doc = catalogoDocs[catalogoId];
   const [checked, setChecked] = useState(false);
-  const storageKey = `check_${slug}_${docId}`;
+  const storageKey = `check_${slug}_${itemId}`;
 
   useEffect(() => {
     setChecked(localStorage.getItem(storageKey) === "1");
@@ -27,14 +29,17 @@ export function DocItem({ slug, docId, status, observacao }: Props) {
     setChecked(v);
     if (v) localStorage.setItem(storageKey, "1");
     else localStorage.removeItem(storageKey);
+    // Disparar evento custom pra outras partes da página recalcularem progresso
+    window.dispatchEvent(new CustomEvent("checks-changed"));
   }
 
   if (!doc) return null;
+  const nome = nomeOverride ?? doc.nome;
 
   return (
     <Link
-      href={`/herdeiro/${slug}/doc/${docId}`}
-      className="block rounded-lg border border-gray-300 bg-white p-3 hover:border-blue-500 hover:shadow-sm transition"
+      href={`/herdeiro/${slug}/doc/${catalogoId}?item=${encodeURIComponent(itemId)}`}
+      className="block rounded-lg border border-gray-300 bg-white p-3 hover:border-blue-500 hover:shadow-sm"
     >
       <div className="flex items-center gap-3">
         <label className="flex shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -43,13 +48,13 @@ export function DocItem({ slug, docId, status, observacao }: Props) {
             checked={checked}
             onChange={toggle}
             onClick={(e) => e.stopPropagation()}
-            aria-label={`Marcar ${doc.nome} como feito`}
+            aria-label={`Marcar ${nome} como feito`}
             className="h-6 w-6 cursor-pointer accent-green-600"
           />
         </label>
         <div className="flex-1 min-w-0">
           <p className={`font-semibold text-sm ${checked ? "line-through text-gray-500" : "text-gray-900"}`}>
-            {doc.nome}
+            {nome}
           </p>
           {observacao && <p className="text-xs text-amber-800 mt-0.5">⚠️ {observacao}</p>}
           <div className="mt-1">
@@ -60,5 +65,17 @@ export function DocItem({ slug, docId, status, observacao }: Props) {
       </div>
       <p className="text-xs text-blue-700 mt-2 font-semibold">Toque para ver como conseguir →</p>
     </Link>
+  );
+}
+
+export function DocItemPronto({ catalogoId, nomeOverride }: { catalogoId: string; nomeOverride?: string }) {
+  const doc = catalogoDocs[catalogoId];
+  if (!doc) return null;
+  const nome = nomeOverride ?? doc.nome;
+  return (
+    <div className="rounded-lg border border-green-300 bg-green-50 p-3 flex items-center gap-3">
+      <span className="h-6 w-6 rounded bg-green-600 text-white text-center font-bold leading-6 shrink-0">✓</span>
+      <p className="text-sm font-semibold text-green-900 line-through flex-1">{nome}</p>
+    </div>
   );
 }
