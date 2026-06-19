@@ -21,13 +21,34 @@ export type PerfilEstendido = {
 
 export type AppIcon = "govbr" | "googledrive" | "meuinss" | "ctps" | "whatsapp" | "youtube" | "papelaria";
 
+export type Passo = {
+  texto: string;
+  emoji?: string;
+  screenshot?: string;
+};
+
+export type Fluxo = {
+  id: string;
+  titulo?: string;
+  intro?: string;
+  passos?: Passo[];
+  videoYoutube?: string;
+  ramificacao?: {
+    pergunta: string;
+    opcoes: { label: string; vaiPara: string }[];
+  };
+};
+
 export type DocCatalogo = {
   id: string;
   nome: string;
   descricao: string;
   iconesApps?: AppIcon[];
   avisos: string[];
-  comoConseguir: string[];
+  dicaCopia?: string;
+  fluxoInicial?: string;
+  fluxos?: Record<string, Fluxo>;
+  comoConseguir?: string[];
   videoYoutube?: string;
   modeloHref?: string;
 };

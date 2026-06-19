@@ -103,6 +103,7 @@ export default function ListaPage() {
             Agora <b>leve TODOS os papéis IMPRESSOS</b> para a Letícia. Não pode mandar foto. Não pode mandar PDF. <b>Só vale papel impresso na mão dela.</b>
           </p>
           <ol className="list-decimal pl-5 space-y-1 text-sm text-green-900">
+            <li><b>Junte tudo num envelope grande de papel pardo</b> (compra na mesma papelaria), com seu nome escrito do lado de fora.</li>
             <li><b>Mande mensagem pela Letícia ANTES</b> para confirmar que ela está em casa.</li>
             <li>Vá até <b>{config.enderecoEntrega}</b>.</li>
             <li>Entregue na mão dela.</li>

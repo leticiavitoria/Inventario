@@ -3,10 +3,10 @@ import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { catalogoDocs } from "@/data/documentos";
 import { getHerdeiro } from "@/data/herdeiros";
-import { AppIconBadge } from "@/components/AppIcon";
 import { MarcarFeito } from "@/components/MarcarFeito";
 import { ChatGPTAjuda } from "@/components/ChatGPTAjuda";
 import { FormattedText } from "@/components/FormattedText";
+import { PassoAPasso } from "@/components/PassoAPasso";
 
 export default function DocPage() {
   const { slug: slugParam, docId: docIdParam } = useParams();
@@ -30,12 +30,9 @@ export default function DocPage() {
         {doc.descricao && <p className="text-sm text-gray-700 mt-1">{doc.descricao}</p>}
       </header>
 
-      {doc.iconesApps && doc.iconesApps.length > 0 && (
-        <section className="rounded-lg border border-gray-300 bg-white p-3">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Onde fazer:</p>
-          <div className="flex flex-wrap gap-2">
-            {doc.iconesApps.map((ic) => <AppIconBadge key={ic} icon={ic} />)}
-          </div>
+      {doc.dicaCopia && (
+        <section className="rounded-lg border-2 border-blue-400 bg-blue-50 p-3 text-sm text-blue-900">
+          <FormattedText text={doc.dicaCopia} />
         </section>
       )}
 
@@ -48,23 +45,16 @@ export default function DocPage() {
         </section>
       )}
 
-      <section className="rounded-lg border border-gray-300 bg-white p-3">
-        <p className="font-bold text-gray-900 text-sm mb-2">Como conseguir:</p>
-        <ol className="list-decimal pl-5 space-y-1.5 text-sm text-gray-800">
-          {doc.comoConseguir.map((p, i) => <li key={i}><FormattedText text={p} /></li>)}
-        </ol>
+      <section>
+        <h2 className="font-bold text-gray-900 text-base mb-2">Passo a passo:</h2>
+        {doc.fluxos && doc.fluxoInicial ? (
+          <PassoAPasso fluxos={doc.fluxos} inicial={doc.fluxoInicial} />
+        ) : doc.comoConseguir ? (
+          <ol className="list-decimal pl-5 space-y-1.5 text-sm text-gray-800">
+            {doc.comoConseguir.map((p, i) => <li key={i}><FormattedText text={p} /></li>)}
+          </ol>
+        ) : null}
       </section>
-
-      {doc.videoYoutube && (
-        <a
-          href={doc.videoYoutube}
-          target="_blank"
-          rel="noopener"
-          className="flex items-center justify-center gap-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold py-3 text-sm"
-        >
-          ▶ Ver vídeo no YouTube — toque aqui →
-        </a>
-      )}
 
       {doc.modeloHref && (
         <a
@@ -83,7 +73,7 @@ export default function DocPage() {
           Você consegue <b>ler o documento impresso com facilidade</b>?
         </p>
         <p className="text-xs text-blue-900 mt-1">
-          ✅ Se SIM: ok, pode marcar como feito.<br/>
+          ✅ Se SIM: ok, pode marcar como feito.<br />
           ❌ Se NÃO: jogue fora e faça outro. Documento ilegível não vale.
         </p>
       </section>
