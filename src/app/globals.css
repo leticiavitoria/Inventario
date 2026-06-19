@@ -3,15 +3,16 @@
 @tailwind utilities;
 
 html {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
+  color: #1a1a1a;
 }
 
-a, button {
+button, a[role="button"] {
   min-height: 44px;
 }
 
@@ -32,7 +33,12 @@ html.alto-contraste a {
 }
 html.alto-contraste .bg-white,
 html.alto-contraste .bg-gray-50,
-html.alto-contraste .bg-blue-50 {
+html.alto-contraste .bg-blue-50,
+html.alto-contraste .bg-purple-50,
+html.alto-contraste .bg-green-50,
+html.alto-contraste .bg-yellow-50,
+html.alto-contraste .bg-amber-50,
+html.alto-contraste .bg-red-50 {
   background: #111 !important;
   color: #fff !important;
 }

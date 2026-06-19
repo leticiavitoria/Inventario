@@ -1,230 +1,150 @@
-import type { Herdeiro } from "./tipos";
+import type { Herdeiro, PerfilHerdeiro, StatusDoc } from "./tipos";
+import { catalogoDocs } from "./documentos";
 
 export const herdeiros: Herdeiro[] = [
   {
     slug: "marcio",
     nome: "Márcio Martins",
     parentesco: "Filho",
-    situacaoCivil: "casado",
-    situacaoRenda: "aposentado",
-    moradores: [
-      { nome: "Esposa", parentesco: "Cônjuge", situacaoRenda: "empregado" },
-      { nome: "Filha 1", parentesco: "Filha", situacaoRenda: "empregado" },
-      { nome: "Filha 2", parentesco: "Filha", situacaoRenda: "empregado" },
-    ],
+    perfilDefault: { situacaoCivil: "casado", temFilhosMaiores: true, qtdMoradores: 3, qtdMaiores: 3, situacaoRenda: "aposentado" },
     observacoesGerais: [
-      "Como você é casado, precisa preencher a Declaração de Uxória.",
+      "Como você é casado, sua esposa precisa assinar a Declaração de Uxória.",
       "Sua esposa e suas filhas maiores de 18 anos também precisam mandar comprovante de renda e extratos bancários.",
     ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG (ou RIC)", status: "falta", tutorialSlug: "escanear" },
-      { id: "cpf", nome: "Cópia do CPF", status: "falta", tutorialSlug: "escanear", observacao: "Se o seu RG já tem CPF, vale como os dois." },
-      { id: "casamento", nome: "Certidão de casamento atualizada", status: "falta", tutorialSlug: "certidoes" },
-      { id: "residencia", nome: "Comprovante de residência DESTE MÊS no seu nome", status: "falta", observacao: "Conta de luz, água, internet ou cartão. Tem que estar no seu nome." },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física (foto, dados, último contrato e página seguinte)", status: "falta", tutorialSlug: "ctps-digital", observacao: "Se não tem mais a física, baixe e preencha a declaração de ausência." },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital (PDF com TODAS as páginas)", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "contracheques", nome: "Contracheques dos últimos 3 meses (seus e da sua esposa e filhas +18)", status: "falta" },
-      { id: "extratos", nome: "Extratos bancários dos últimos 3 meses (de TODAS as contas, suas e da família)", status: "falta" },
-      { id: "extrato-beneficio", nome: "Extrato de benefício (aposentadoria/pensão) — Meu INSS", status: "falta", tutorialSlug: "meu-inss" },
-      { id: "uxoria", nome: "Declaração de Uxória preenchida e assinada", status: "falta", modeloHref: "/modelos/declaracao-uxoria.pdf", tutorialSlug: "declaracoes" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência preenchida e assinada", status: "falta", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf", tutorialSlug: "declaracoes" },
-      { id: "questionario", nome: "Questionário Socioeconômico preenchido", status: "falta", modeloHref: "/modelos/questionario-socioeconomico.pdf", tutorialSlug: "declaracoes" },
-      { id: "termo", nome: "Termo de Consentimento preenchido e assinado", status: "falta", modeloHref: "/modelos/termo-consentimento.pdf", tutorialSlug: "declaracoes" },
-    ],
+    statusConhecido: {
+      rg: { status: "falta" },
+      cpf: { status: "falta" },
+      certidao_casamento: { status: "falta" },
+      comprovante_residencia: { status: "falta" },
+      ctps_fisica: { status: "falta" },
+      ctps_digital: { status: "falta" },
+      contracheques: { status: "falta" },
+      extratos_bancarios: { status: "falta" },
+      extrato_inss: { status: "falta" },
+      declaracao_uxoria: { status: "falta" },
+      declaracao_hipossuficiencia: { status: "falta" },
+      questionario_socioeconomico: { status: "falta" },
+      termo_consentimento: { status: "falta" },
+    },
   },
   {
     slug: "moacir",
     nome: "Moacir Martins",
     parentesco: "Filho",
-    situacaoCivil: "solteiro",
-    situacaoRenda: "empregado",
-    moradores: [],
-    observacoesGerais: [
-      "Você está com TUDO em ordem. Só preciso da sua confirmação por mensagem!",
-    ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG", status: "ok" },
-      { id: "cpf", nome: "Cópia do CPF", status: "ok" },
-      { id: "nascimento", nome: "Certidão de nascimento atualizada", status: "ok" },
-      { id: "residencia", nome: "Comprovante de residência", status: "ok" },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física", status: "ok" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital", status: "ok" },
-      { id: "contracheques", nome: "Contracheques dos últimos 3 meses", status: "ok" },
-      { id: "extratos", nome: "Extratos bancários dos últimos 3 meses", status: "ok" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência", status: "ok", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "ok", modeloHref: "/modelos/questionario-socioeconomico.pdf" },
-      { id: "termo", nome: "Termo de Consentimento", status: "ok", modeloHref: "/modelos/termo-consentimento.pdf" },
-    ],
+    perfilDefault: { situacaoCivil: "solteiro", temFilhosMaiores: false, qtdMoradores: 1, qtdMaiores: 1, situacaoRenda: "empregado" },
+    observacoesGerais: ["Seus documentos estão todos em ordem. Só confirme."],
+    statusConhecido: {
+      rg: { status: "ok" }, cpf: { status: "ok" }, certidao_nascimento: { status: "ok" },
+      comprovante_residencia: { status: "ok" }, ctps_fisica: { status: "ok" }, ctps_digital: { status: "ok" },
+      contracheques: { status: "ok" }, extratos_bancarios: { status: "ok" },
+      declaracao_hipossuficiencia: { status: "ok" }, questionario_socioeconomico: { status: "ok" }, termo_consentimento: { status: "ok" },
+    },
   },
   {
     slug: "antonio",
     nome: "Antônio Marcílio Martins",
     parentesco: "Filho",
-    situacaoCivil: "solteiro",
-    situacaoRenda: "afastado_inss",
-    moradores: [],
+    perfilDefault: { situacaoCivil: "solteiro", temFilhosMaiores: false, qtdMoradores: 1, qtdMaiores: 1, situacaoRenda: "afastado_inss" },
     observacoesGerais: [
-      "Você está afastado pelo INSS — precisa do extrato do benefício (Meu INSS) + 3 últimos contracheques antes do afastamento + Carteira de Trabalho.",
+      "Você está afastado pelo INSS. Precisa do extrato do benefício + os 3 contracheques de antes do afastamento.",
     ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG (ou RIC)", status: "falta", tutorialSlug: "escanear" },
-      { id: "cpf", nome: "Cópia do CPF", status: "falta", tutorialSlug: "escanear" },
-      { id: "nascimento", nome: "Certidão de nascimento atualizada", status: "falta", tutorialSlug: "certidoes" },
-      { id: "residencia", nome: "Comprovante de residência DESTE MÊS no seu nome", status: "falta" },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital (todas as páginas)", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "extrato-inss", nome: "Extrato de pagamento do benefício INSS", status: "falta", tutorialSlug: "meu-inss" },
-      { id: "contracheques-antes", nome: "3 últimos contracheques ANTES do afastamento", status: "falta" },
-      { id: "extratos", nome: "Extratos bancários dos últimos 3 meses (todas as contas)", status: "falta" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência", status: "falta", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf", tutorialSlug: "declaracoes" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "falta", modeloHref: "/modelos/questionario-socioeconomico.pdf", tutorialSlug: "declaracoes" },
-      { id: "termo", nome: "Termo de Consentimento", status: "falta", modeloHref: "/modelos/termo-consentimento.pdf", tutorialSlug: "declaracoes" },
-    ],
+    statusConhecido: {
+      rg: { status: "falta" }, cpf: { status: "falta" }, certidao_nascimento: { status: "falta" },
+      comprovante_residencia: { status: "falta" }, ctps_fisica: { status: "falta" }, ctps_digital: { status: "falta" },
+      extrato_inss: { status: "falta" }, contracheques_antes_inss: { status: "falta" }, extratos_bancarios: { status: "falta" },
+      declaracao_hipossuficiencia: { status: "falta" }, questionario_socioeconomico: { status: "falta" }, termo_consentimento: { status: "falta" },
+    },
   },
   {
     slug: "milene",
     nome: "Milene Martins",
-    parentesco: "Neta (filha do Marcos, falecido)",
-    situacaoCivil: "solteiro",
-    situacaoRenda: "empregado",
-    moradores: [
-      { nome: "Patrícia (mãe)", parentesco: "Mãe", situacaoRenda: "empregado" },
-    ],
+    parentesco: "Neta (filha do Marcos)",
+    perfilDefault: { situacaoCivil: "solteiro", temFilhosMaiores: false, qtdMoradores: 2, qtdMaiores: 2, situacaoRenda: "empregado" },
     observacoesGerais: [
-      "Você precisa pedir à sua mãe (Patrícia) a CERTIDÃO DE CASAMENTO ATUALIZADA dela com o Marcos (com a averbação do divórcio). É essa que substitui a certidão de nascimento dele.",
-      "Os documentos do seu pai (Marcos) já vão ser enviados pela Lamarkiane. Você não precisa se preocupar com eles.",
+      "MUITO IMPORTANTE: peça à sua mãe (Patrícia) a certidão de casamento ATUALIZADA dela com o Marcos (com a averbação do divórcio). É essa que substitui a certidão de nascimento do seu pai.",
     ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG (ou RIC)", status: "falta", tutorialSlug: "escanear" },
-      { id: "cpf", nome: "Cópia do CPF", status: "falta", tutorialSlug: "escanear" },
-      { id: "nascimento", nome: "Certidão de nascimento atualizada", status: "falta", tutorialSlug: "certidoes" },
-      { id: "residencia", nome: "Comprovante de residência DESTE MÊS no seu nome", status: "falta" },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital (todas as páginas)", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "contracheques", nome: "Contracheques dos últimos 3 meses (seus e da sua mãe)", status: "falta" },
-      { id: "extratos", nome: "Extratos bancários dos últimos 3 meses (suas contas e da sua mãe)", status: "falta" },
-      { id: "casamento-patricia", nome: "Certidão de casamento atualizada da Patrícia com o Marcos (com averbação do divórcio)", status: "falta", tutorialSlug: "certidoes", observacao: "Substitui a certidão de nascimento do seu pai." },
-      { id: "obito-pai", nome: "Certidão de óbito do Marcos (seu pai) — Lamarkiane envia", status: "na" },
-      { id: "cpf-pai", nome: "CPF do Marcos (seu pai) — Lamarkiane envia", status: "na" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência", status: "falta", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf", tutorialSlug: "declaracoes" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "falta", modeloHref: "/modelos/questionario-socioeconomico.pdf", tutorialSlug: "declaracoes" },
-      { id: "termo", nome: "Termo de Consentimento", status: "falta", modeloHref: "/modelos/termo-consentimento.pdf", tutorialSlug: "declaracoes" },
+    docsExtras: [
+      { id: "certidao_casamento_patricia_marcos", status: "falta" },
     ],
+    statusConhecido: {
+      rg: { status: "falta" }, cpf: { status: "falta" }, certidao_nascimento: { status: "falta" },
+      comprovante_residencia: { status: "falta" }, ctps_fisica: { status: "falta" }, ctps_digital: { status: "falta" },
+      contracheques: { status: "falta" }, extratos_bancarios: { status: "falta" },
+      declaracao_hipossuficiencia: { status: "falta" }, questionario_socioeconomico: { status: "falta" }, termo_consentimento: { status: "falta" },
+    },
   },
   {
     slug: "lamarkiane",
     nome: "Lamarkiane Martins",
-    parentesco: "Neta (filha do Marcos, falecido)",
-    situacaoCivil: "casado",
-    situacaoRenda: "empregado",
-    responsavelPorFalecido: "Marcos Martins",
-    moradores: [
-      { nome: "Marido", parentesco: "Cônjuge", situacaoRenda: "empregado" },
-      { nome: "Filho/Filha +18", parentesco: "Filho(a)", situacaoRenda: "empregado" },
-    ],
+    parentesco: "Neta (filha do Marcos)",
+    perfilDefault: { situacaoCivil: "casado", temFilhosMaiores: true, qtdMoradores: 5, qtdMaiores: 3, situacaoRenda: "empregado" },
     observacoesGerais: [
-      "Você é a RESPONSÁVEL por enviar os documentos do seu pai Marcos (óbito e CPF). A certidão de casamento atualizada (com Patrícia) vai vir da Milene.",
-      "Como você é casada, precisa da Declaração de Uxória.",
-      "Seu marido e seu filho/filha maior de 18 também precisam enviar comprovante de renda e extratos.",
+      "Você é a responsável por enviar os documentos do seu pai Marcos (óbito e CPF).",
+      "Confira com a Milene se a Patrícia já enviou a certidão de casamento atualizada (precisa pra completar os documentos do Marcos).",
     ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG (ou RIC)", status: "ok" },
-      { id: "cpf", nome: "Cópia do CPF", status: "ok" },
-      { id: "casamento", nome: "Certidão de casamento ATUALIZADA (novo padrão)", status: "errado", tutorialSlug: "certidoes", observacao: "A que você tem precisa ser atualizada para o novo padrão." },
-      { id: "residencia", nome: "Comprovante de residência", status: "ok" },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital (todas as páginas)", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "contracheques", nome: "Contracheques 3 últimos meses (seus, marido, filho/filha +18)", status: "falta" },
-      { id: "extratos", nome: "Extratos bancários 3 últimos meses (TODAS as contas da casa)", status: "falta" },
-      { id: "uxoria", nome: "Declaração de Uxória", status: "falta", modeloHref: "/modelos/declaracao-uxoria.pdf", tutorialSlug: "declaracoes" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência", status: "ok", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "ok", modeloHref: "/modelos/questionario-socioeconomico.pdf" },
-      { id: "termo", nome: "Termo de Consentimento", status: "ok", modeloHref: "/modelos/termo-consentimento.pdf" },
-      { id: "obito-marcos", nome: "Certidão de óbito do Marcos (seu pai)", status: "ok" },
-      { id: "cpf-marcos", nome: "CPF do Marcos (seu pai)", status: "ok" },
-    ],
+    statusConhecido: {
+      rg: { status: "ok" }, cpf: { status: "ok" },
+      certidao_casamento: { status: "errado", observacao: "Precisa ser atualizada para o novo padrão." },
+      comprovante_residencia: { status: "ok" }, ctps_fisica: { status: "falta" }, ctps_digital: { status: "falta" },
+      contracheques: { status: "falta" }, extratos_bancarios: { status: "falta" },
+      declaracao_uxoria: { status: "falta" },
+      declaracao_hipossuficiencia: { status: "ok" }, questionario_socioeconomico: { status: "ok" }, termo_consentimento: { status: "ok" },
+      certidao_obito_pai: { status: "ok" }, cpf_pai: { status: "ok" },
+    },
   },
   {
     slug: "kelriane",
     nome: "Kelriane Martins",
-    parentesco: "Neta (filha do Marcos, falecido)",
-    situacaoCivil: "solteiro",
-    situacaoRenda: "empregado",
-    moradores: [
-      { nome: "Mãe (1ª ex-esposa do Marcos)", parentesco: "Mãe", situacaoRenda: "empregado" },
-      { nome: "Jane Kelly", parentesco: "Irmã", situacaoRenda: "empregado" },
-    ],
+    parentesco: "Neta (filha do Marcos)",
+    perfilDefault: { situacaoCivil: "solteiro", temFilhosMaiores: false, qtdMoradores: 3, qtdMaiores: 3, situacaoRenda: "empregado" },
     observacoesGerais: [
-      "Você mora com a Jane Kelly — cada uma faz seu próprio cadastro, mas os comprovantes de renda da casa contam pra vocês duas.",
-      "Os documentos do seu pai (Marcos) já vão ser enviados pela Lamarkiane.",
+      "Confira com a Milene se a Patrícia já enviou a certidão de casamento atualizada do seu pai.",
+      "Cada irmã (você e Jane Kelly) faz seu próprio cadastro separado.",
     ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG (ou RIC)", status: "ok" },
-      { id: "cpf", nome: "Cópia do CPF", status: "ok" },
-      { id: "nascimento", nome: "Certidão de nascimento ATUALIZADA (novo padrão)", status: "errado", tutorialSlug: "certidoes", observacao: "Precisa ser atualizada para o novo padrão." },
-      { id: "residencia", nome: "Comprovante de residência DESTE MÊS no SEU nome", status: "errado", observacao: "Precisa estar no seu próprio nome e ser do mês atual." },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital (TODAS as páginas)", status: "errado", tutorialSlug: "ctps-digital", observacao: "Falta páginas — precisa ser TODAS." },
-      { id: "contracheques", nome: "Contracheques dos últimos 3 meses", status: "errado", observacao: "Precisa ser os 3 últimos meses." },
-      { id: "extratos", nome: "Extratos bancários 3 últimos meses (todas as contas)", status: "falta" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência", status: "ok", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "falta", modeloHref: "/modelos/questionario-socioeconomico.pdf", tutorialSlug: "declaracoes" },
-      { id: "termo", nome: "Termo de Consentimento", status: "ok", modeloHref: "/modelos/termo-consentimento.pdf" },
-    ],
+    statusConhecido: {
+      rg: { status: "ok" }, cpf: { status: "ok" },
+      certidao_nascimento: { status: "errado", observacao: "Precisa ser atualizada para o novo padrão." },
+      comprovante_residencia: { status: "errado", observacao: "Precisa estar no seu próprio nome e ser deste mês." },
+      ctps_fisica: { status: "falta" },
+      ctps_digital: { status: "errado", observacao: "Faltam páginas — precisa ser TODAS." },
+      contracheques: { status: "errado", observacao: "Precisa ser os 3 últimos meses." },
+      extratos_bancarios: { status: "falta" },
+      declaracao_hipossuficiencia: { status: "ok" }, questionario_socioeconomico: { status: "falta" }, termo_consentimento: { status: "ok" },
+    },
   },
   {
     slug: "jane-kelly",
     nome: "Jane Kelly Martins",
-    parentesco: "Neta (filha do Marcos, falecido)",
-    situacaoCivil: "solteiro",
-    situacaoRenda: "empregado",
-    moradores: [
-      { nome: "Mãe (1ª ex-esposa do Marcos)", parentesco: "Mãe", situacaoRenda: "empregado" },
-      { nome: "Kelriane", parentesco: "Irmã", situacaoRenda: "empregado" },
-    ],
+    parentesco: "Neta (filha do Marcos)",
+    perfilDefault: { situacaoCivil: "solteiro", temFilhosMaiores: false, qtdMoradores: 3, qtdMaiores: 3, situacaoRenda: "empregado" },
     observacoesGerais: [
-      "Você mora com a Kelriane — cada uma faz seu próprio cadastro.",
-      "Os documentos do seu pai (Marcos) já vão ser enviados pela Lamarkiane.",
+      "Confira com a Milene se a Patrícia já enviou a certidão de casamento atualizada do seu pai.",
+      "Cada irmã (você e Kelriane) faz seu próprio cadastro separado.",
     ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG (ou RIC)", status: "ok" },
-      { id: "cpf", nome: "Cópia do CPF", status: "ok" },
-      { id: "nascimento", nome: "Certidão de nascimento ATUALIZADA (novo padrão)", status: "errado", tutorialSlug: "certidoes", observacao: "Precisa ser atualizada para o novo padrão." },
-      { id: "residencia", nome: "Comprovante de residência DESTE MÊS no SEU nome", status: "errado", observacao: "Precisa estar no seu próprio nome e ser do mês atual." },
-      { id: "ctps-fisica", nome: "Carteira de Trabalho física", status: "falta", tutorialSlug: "ctps-digital" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital (TODAS as páginas)", status: "errado", tutorialSlug: "ctps-digital", observacao: "Falta páginas — precisa ser TODAS." },
-      { id: "contracheques", nome: "Contracheques dos últimos 3 meses", status: "errado", observacao: "Precisa ser os 3 últimos meses." },
-      { id: "extratos", nome: "Extratos bancários 3 últimos meses (todas as contas)", status: "falta" },
-      { id: "hipossuficiencia", nome: "Declaração de Hipossuficiência", status: "ok", modeloHref: "/modelos/declaracao-hipossuficiencia.pdf" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "falta", modeloHref: "/modelos/questionario-socioeconomico.pdf", tutorialSlug: "declaracoes" },
-      { id: "termo", nome: "Termo de Consentimento", status: "ok", modeloHref: "/modelos/termo-consentimento.pdf" },
-    ],
+    statusConhecido: {
+      rg: { status: "ok" }, cpf: { status: "ok" },
+      certidao_nascimento: { status: "errado", observacao: "Precisa ser atualizada para o novo padrão." },
+      comprovante_residencia: { status: "errado", observacao: "Precisa estar no seu próprio nome e ser deste mês." },
+      ctps_fisica: { status: "falta" },
+      ctps_digital: { status: "errado", observacao: "Faltam páginas — precisa ser TODAS." },
+      contracheques: { status: "errado", observacao: "Precisa ser os 3 últimos meses." },
+      extratos_bancarios: { status: "falta" },
+      declaracao_hipossuficiencia: { status: "ok" }, questionario_socioeconomico: { status: "falta" }, termo_consentimento: { status: "ok" },
+    },
   },
   {
     slug: "leticia",
     nome: "Letícia Martins",
-    parentesco: "Neta (filha do Anísio, falecido)",
-    situacaoCivil: "solteiro",
-    situacaoRenda: "empregado",
-    moradores: [
-      { nome: "Mãe", parentesco: "Mãe", situacaoRenda: "empregado" },
-    ],
-    observacoesGerais: [
-      "Seus documentos estão TODOS em ordem. Você é quem está organizando tudo isso! 💪",
-    ],
-    documentos: [
-      { id: "rg", nome: "Cópia do RG", status: "ok" },
-      { id: "cpf", nome: "Cópia do CPF", status: "ok" },
-      { id: "nascimento", nome: "Certidão de nascimento atualizada", status: "ok" },
-      { id: "residencia", nome: "Comprovante de residência", status: "ok" },
-      { id: "ctps-digital", nome: "Carteira de Trabalho Digital", status: "ok" },
-      { id: "extratos", nome: "Extratos bancários", status: "ok" },
-      { id: "questionario", nome: "Questionário Socioeconômico", status: "ok" },
-      { id: "termo", nome: "Termo de Consentimento", status: "ok" },
-      { id: "obito-anisio", nome: "Certidão de óbito do Anísio (seu pai)", status: "ok" },
-      { id: "nascimento-anisio", nome: "Certidão de nascimento/casamento do Anísio", status: "ok" },
-      { id: "cpf-anisio", nome: "CPF do Anísio (seu pai)", status: "ok" },
-    ],
+    parentesco: "Neta (filha do Anísio)",
+    perfilDefault: { situacaoCivil: "solteiro", temFilhosMaiores: false, qtdMoradores: 2, qtdMaiores: 2, situacaoRenda: "empregado" },
+    observacoesGerais: ["Seus documentos estão todos em ordem."],
+    statusConhecido: {
+      rg: { status: "ok" }, cpf: { status: "ok" }, certidao_nascimento: { status: "ok" },
+      comprovante_residencia: { status: "ok" }, ctps_digital: { status: "ok" },
+      extratos_bancarios: { status: "ok" },
+      questionario_socioeconomico: { status: "ok" }, termo_consentimento: { status: "ok" },
+      certidao_obito_pai: { status: "ok" }, cpf_pai: { status: "ok" }, certidao_nascimento_casamento_pai: { status: "ok" },
+    },
   },
 ];
 
@@ -232,8 +152,74 @@ export function getHerdeiro(slug: string) {
   return herdeiros.find((h) => h.slug === slug);
 }
 
-export function resumoStatus(h: Herdeiro) {
-  const total = h.documentos.filter((d) => d.status !== "na").length;
-  const ok = h.documentos.filter((d) => d.status === "ok").length;
+// Gera lista de documentos a partir do perfil — fonte única de verdade.
+export function gerarDocumentos(h: Herdeiro, perfil: PerfilHerdeiro): { id: string; status: StatusDoc; observacao?: string }[] {
+  const ids: string[] = [];
+  ids.push("rg", "cpf");
+
+  if (perfil.situacaoCivil === "solteiro") {
+    ids.push("certidao_nascimento");
+  } else {
+    ids.push("certidao_casamento");
+  }
+
+  ids.push("comprovante_residencia");
+
+  // Documentos de renda baseados na situação
+  if (perfil.situacaoRenda === "empregado") {
+    ids.push("ctps_fisica", "ctps_digital", "contracheques", "extratos_bancarios");
+  } else if (perfil.situacaoRenda === "autonomo" || perfil.situacaoRenda === "desempregado") {
+    ids.push("ctps_fisica", "ctps_digital", "extratos_bancarios");
+  } else if (perfil.situacaoRenda === "aposentado") {
+    ids.push("ctps_fisica", "ctps_digital", "extrato_inss", "extratos_bancarios");
+  } else if (perfil.situacaoRenda === "afastado_inss") {
+    ids.push("ctps_fisica", "ctps_digital", "extrato_inss", "contracheques_antes_inss", "extratos_bancarios");
+  }
+
+  // Declaração de inexistência de CTPS — sempre opcional (mostrar como opcional)
+  ids.push("declaracao_inexistencia_ctps");
+
+  // Declaração uxória só para casados / união estável
+  if (perfil.situacaoCivil === "casado" || perfil.situacaoCivil === "uniao_estavel") {
+    ids.push("declaracao_uxoria");
+  }
+
+  ids.push("declaracao_hipossuficiencia", "questionario_socioeconomico", "termo_consentimento");
+
+  // Para netos (filhos de herdeiros falecidos), incluir docs do pai
+  if (h.parentesco.startsWith("Neta") || h.parentesco.startsWith("Neto")) {
+    ids.push("certidao_obito_pai", "cpf_pai", "certidao_nascimento_casamento_pai");
+  }
+
+  // Filtrar duplicatas mantendo ordem
+  const unicos = Array.from(new Set(ids));
+
+  // Aplicar status conhecido e filtrar docs que não existem no catálogo
+  const resultado = unicos
+    .filter((id) => !!catalogoDocs[id])
+    .map((id) => {
+      const known = h.statusConhecido?.[id];
+      return {
+        id,
+        status: (known?.status ?? "falta") as StatusDoc,
+        observacao: known?.observacao,
+      };
+    });
+
+  // Adicionar docs extras (ex: certidão Patrícia para Milene) — mas só se id existir no catálogo
+  if (h.docsExtras) {
+    for (const ex of h.docsExtras) {
+      if (catalogoDocs[ex.id] && !resultado.find((r) => r.id === ex.id)) {
+        resultado.push({ id: ex.id, status: ex.status, observacao: ex.observacao });
+      }
+    }
+  }
+
+  return resultado;
+}
+
+export function resumoStatus(docs: { status: StatusDoc }[]) {
+  const total = docs.filter((d) => d.status !== "na").length;
+  const ok = docs.filter((d) => d.status === "ok").length;
   return { ok, total, pct: total > 0 ? Math.round((ok / total) * 100) : 0 };
 }

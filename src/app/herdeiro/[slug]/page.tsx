@@ -1,89 +1,141 @@
-import { notFound } from "next/navigation";
+"use client";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { herdeiros, getHerdeiro, resumoStatus } from "@/data/herdeiros";
-import { AvisoFixo } from "@/components/AvisoFixo";
-import { ContagemRegressiva } from "@/components/ContagemRegressiva";
-import { DocumentoCard } from "@/components/DocumentoCard";
-import { config } from "@/lib/config";
+import { useEffect, useState } from "react";
+import { getHerdeiro } from "@/data/herdeiros";
+import { perguntas } from "@/data/perguntas";
+import type { PerfilHerdeiro, SituacaoCivil, SituacaoRenda } from "@/data/tipos";
 
-export function generateStaticParams() {
-  return herdeiros.map((h) => ({ slug: h.slug }));
-}
+const moradoresMap: Record<string, number> = { "1": 1, "2": 2, "3": 3, "4": 4, "5+": 5 };
+const maioresMap: Record<string, number> = { "1": 1, "2": 2, "3": 3, "4+": 4 };
 
-export default function HerdeiroPage({ params }: { params: { slug: string } }) {
-  const h = getHerdeiro(params.slug);
-  if (!h) return notFound();
-  const r = resumoStatus(h);
-  const faltam = h.documentos.filter((d) => d.status === "falta" || d.status === "errado");
-  const prontos = h.documentos.filter((d) => d.status === "ok");
-  const na = h.documentos.filter((d) => d.status === "na");
-  const whatsappMsg = encodeURIComponent(`Oi Letícia, sou ${h.nome}. Já tenho meus documentos prontos!`);
-  const whatsappUrl = `https://wa.me/${config.whatsappLeticia}?text=${whatsappMsg}`;
+export default function QuestionarioPage() {
+  const params = useParams();
+  const router = useRouter();
+  const slug = String(params.slug);
+  const h = getHerdeiro(slug);
+  const [step, setStep] = useState(0);
+  const [respostas, setRespostas] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!h) return;
+    const saved = localStorage.getItem(`perfil_${slug}`);
+    if (saved) {
+      try { setRespostas(JSON.parse(saved)); } catch {}
+    } else {
+      const d = h.perfilDefault;
+      setRespostas({
+        civil: d.situacaoCivil,
+        filhos18: d.temFilhosMaiores ? "sim" : "nao",
+        moradores: d.qtdMoradores >= 5 ? "5+" : String(d.qtdMoradores),
+        maiores: d.qtdMaiores >= 4 ? "4+" : String(d.qtdMaiores),
+        renda: d.situacaoRenda,
+      });
+    }
+  }, [h, slug]);
+
+  if (!h) {
+    return <p>Herdeiro não encontrado. <Link href="/" className="text-blue-700 underline">Voltar</Link></p>;
+  }
+
+  const totalSteps = perguntas.length + 1;
+
+  function escolher(id: string, valor: string) {
+    const novo = { ...respostas, [id]: valor };
+    setRespostas(novo);
+    setTimeout(() => setStep((s) => s + 1), 150);
+  }
+
+  function confirmar() {
+    const perfil: PerfilHerdeiro = {
+      situacaoCivil: respostas.civil as SituacaoCivil,
+      temFilhosMaiores: respostas.filhos18 === "sim",
+      qtdMoradores: moradoresMap[respostas.moradores] ?? 1,
+      qtdMaiores: maioresMap[respostas.maiores] ?? 1,
+      situacaoRenda: respostas.renda as SituacaoRenda,
+    };
+    localStorage.setItem(`perfil_${slug}`, JSON.stringify(respostas));
+    localStorage.setItem(`perfilObj_${slug}`, JSON.stringify(perfil));
+    router.push(`/herdeiro/${slug}/lista`);
+  }
 
   return (
-    <div className="space-y-6">
-      <Link href="/" className="text-blue-700 underline">← Voltar</Link>
-
-      <section className="rounded-xl bg-blue-900 text-white p-5">
-        <h1 className="text-2xl font-extrabold">Olá, {h.nome.split(" ")[0]}!</h1>
-        <p className="text-base mt-1">{h.parentesco}</p>
-        <p className="mt-3 text-lg font-bold">
-          {r.ok} de {r.total} documentos prontos ({r.pct}%)
-        </p>
-        <div className="mt-2 w-full bg-blue-950 rounded-full h-4 overflow-hidden">
-          <div className="bg-green-400 h-full" style={{ width: `${r.pct}%` }} />
+    <div className="space-y-4">
+      <Link href="/" className="text-blue-700 underline text-sm">← Voltar</Link>
+      <div className="bg-white rounded-lg border border-gray-300 p-3 text-center">
+        <p className="text-sm text-gray-600">Olá,</p>
+        <p className="text-lg font-bold text-blue-900">{h.nome.split(" ")[0]}</p>
+        <div className="mt-2 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div className="bg-blue-600 h-full transition-all" style={{ width: `${((step + 1) / totalSteps) * 100}%` }} />
         </div>
-      </section>
+        <p className="text-xs text-gray-600 mt-1">Pergunta {Math.min(step + 1, totalSteps)} de {totalSteps}</p>
+      </div>
 
-      <ContagemRegressiva />
-      <AvisoFixo />
-
-      {h.observacoesGerais && h.observacoesGerais.length > 0 && (
-        <section className="rounded-xl border-2 border-amber-600 bg-amber-50 p-4">
-          <h2 className="text-lg font-bold text-amber-900 mb-2">📌 Atenção especial pra você:</h2>
-          <ul className="list-disc pl-6 space-y-1 text-base text-amber-900">
-            {h.observacoesGerais.map((o, i) => <li key={i}>{o}</li>)}
-          </ul>
-        </section>
+      {step < perguntas.length ? (
+        <PerguntaCard
+          key={perguntas[step].id}
+          pergunta={perguntas[step]}
+          atual={respostas[perguntas[step].id]}
+          onEscolher={(v: string) => escolher(perguntas[step].id, v)}
+          onVoltar={step > 0 ? () => setStep((s) => s - 1) : null}
+        />
+      ) : (
+        <Resumo respostas={respostas} onConfirmar={confirmar} onVoltar={() => setStep(perguntas.length - 1)} />
       )}
-
-      {faltam.length > 0 && (
-        <section>
-          <h2 className="text-2xl font-bold mb-3 text-red-800">
-            🚨 Falta ({faltam.length}) — comece por aqui:
-          </h2>
-          <div className="space-y-3">
-            {faltam.map((d) => <DocumentoCard key={d.id} doc={d} />)}
-          </div>
-        </section>
-      )}
-
-      {prontos.length > 0 && (
-        <section>
-          <h2 className="text-xl font-bold mb-3 text-green-800">✅ Já está pronto ({prontos.length})</h2>
-          <div className="space-y-3">
-            {prontos.map((d) => <DocumentoCard key={d.id} doc={d} />)}
-          </div>
-        </section>
-      )}
-
-      {na.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold mb-3 text-gray-700">Não se aplica ({na.length})</h2>
-          <div className="space-y-3">
-            {na.map((d) => <DocumentoCard key={d.id} doc={d} />)}
-          </div>
-        </section>
-      )}
-
-      <a
-        href={whatsappUrl}
-        target="_blank"
-        rel="noopener"
-        className="block w-full text-center rounded-xl bg-green-600 hover:bg-green-700 text-white px-6 py-4 text-lg font-bold shadow-lg"
-      >
-        💬 Já tenho TUDO — falar com a Letícia
-      </a>
     </div>
+  );
+}
+
+type PerguntaCardProps = {
+  pergunta: { titulo: string; opcoes: { valor: string; label: string }[] };
+  atual: string | undefined;
+  onEscolher: (v: string) => void;
+  onVoltar: (() => void) | null;
+};
+
+function PerguntaCard({ pergunta, atual, onEscolher, onVoltar }: PerguntaCardProps) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-bold text-gray-900">{pergunta.titulo}</h2>
+      <div className="space-y-2">
+        {pergunta.opcoes.map((o) => (
+          <button
+            key={o.valor}
+            onClick={() => onEscolher(o.valor)}
+            className={`block w-full text-left rounded-lg border-2 p-3 font-semibold text-sm ${
+              atual === o.valor ? "border-blue-700 bg-blue-50 text-blue-900" : "border-gray-300 bg-white text-gray-900 hover:border-blue-400"
+            }`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      {onVoltar && (
+        <button onClick={onVoltar} className="text-blue-700 underline text-sm">← Pergunta anterior</button>
+      )}
+    </section>
+  );
+}
+
+type ResumoProps = { respostas: Record<string, string>; onConfirmar: () => void; onVoltar: () => void };
+
+function Resumo({ respostas, onConfirmar, onVoltar }: ResumoProps) {
+  const civilLabel = perguntas[0].opcoes.find((o) => o.valor === respostas.civil)?.label;
+  const rendaLabel = perguntas[4].opcoes.find((o) => o.valor === respostas.renda)?.label;
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-bold text-gray-900">Confira suas respostas:</h2>
+      <ul className="rounded-lg border border-gray-300 bg-white p-3 space-y-1.5 text-sm">
+        <li><b>Estado civil:</b> {civilLabel}</li>
+        <li><b>Filhos +18 morando junto:</b> {respostas.filhos18 === "sim" ? "Sim" : "Não"}</li>
+        <li><b>Pessoas na casa:</b> {respostas.moradores}</li>
+        <li><b>Adultos na casa:</b> {respostas.maiores}</li>
+        <li><b>Renda:</b> {rendaLabel}</li>
+      </ul>
+      <button onClick={onConfirmar} className="w-full rounded-lg bg-blue-700 hover:bg-blue-800 text-white font-bold py-3">
+        Ver meus documentos →
+      </button>
+      <button onClick={onVoltar} className="text-blue-700 underline text-sm">← Mudar respostas</button>
+    </section>
   );
 }
