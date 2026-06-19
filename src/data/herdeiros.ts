@@ -254,15 +254,14 @@ export function getHerdeiro(slug: string) {
 
 function docsDeRenda(renda: SituacaoRenda, ctpsFisica: boolean): string[] {
   const ids: string[] = [];
-  // CTPS sempre que tem física
   if (ctpsFisica) ids.push("ctps_fisica");
   else ids.push("declaracao_inexistencia_ctps");
-  // CTPS digital sempre
   ids.push("ctps_digital");
-  // Renda específica
   if (renda === "empregado") {
     ids.push("contracheques", "extratos_bancarios");
-  } else if (renda === "autonomo" || renda === "desempregado") {
+  } else if (renda === "autonomo") {
+    ids.push("imposto_renda", "declaracao_ausencia_renda", "extratos_bancarios");
+  } else if (renda === "desempregado") {
     ids.push("declaracao_ausencia_renda", "extratos_bancarios");
   } else if (renda === "aposentado") {
     ids.push("extrato_inss", "extratos_bancarios");
@@ -274,14 +273,24 @@ function docsDeRenda(renda: SituacaoRenda, ctpsFisica: boolean): string[] {
   return ids;
 }
 
-function docsMoradorPorRenda(renda: SituacaoRenda): string[] {
-  // Para moradores +18, usamos IDs prefixados "m_" do catálogo
-  const ids: string[] = ["m_extratos"];
-  if (renda === "empregado") ids.unshift("m_contracheques");
-  else if (renda === "autonomo" || renda === "desempregado") ids.unshift("m_ausencia_renda");
-  else if (renda === "aposentado") ids.unshift("m_extrato_inss");
-  else if (renda === "afastado_inss") ids.unshift("m_extrato_inss");
-  else if (renda === "mei_empresario") ids.unshift("m_mei_empresario");
+// Moradores seguem a MESMA regra do herdeiro por situação trabalhista.
+// Diferenças: assumimos que o morador tem CTPS física (sem perguntar) e
+// não duplicamos extratos bancários gerais.
+function docsDeRendaParaMorador(renda: SituacaoRenda): string[] {
+  const ids: string[] = ["ctps_fisica", "ctps_digital"];
+  if (renda === "empregado") {
+    ids.push("contracheques");
+  } else if (renda === "autonomo") {
+    ids.push("imposto_renda", "declaracao_ausencia_renda");
+  } else if (renda === "desempregado") {
+    // só CTPS (mostra o desemprego pela ausência de novo contrato)
+  } else if (renda === "aposentado") {
+    ids.push("extrato_inss");
+  } else if (renda === "afastado_inss") {
+    ids.push("extrato_inss", "contracheques_antes_inss");
+  } else if (renda === "mei_empresario") {
+    ids.push("m_mei_empresario");
+  }
   return ids;
 }
 
@@ -315,7 +324,7 @@ export function gerarSecoes(h: Herdeiro, perfil: PerfilEstendido): Secao[] {
 
   // === SEÇÃO 2+: moradores +18 ===
   for (const m of perfil.moradoresMaiores) {
-    const idsMorador = docsMoradorPorRenda(m.situacaoRenda);
+    const idsMorador = docsDeRendaParaMorador(m.situacaoRenda);
     const docsM: DocItemSecao[] = idsMorador.map((cid) =>
       buildDoc(cid, `${m.id}__${cid}`, "falta")
     );

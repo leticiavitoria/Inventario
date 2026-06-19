@@ -3,7 +3,7 @@ import type { DocCatalogo, Fluxo } from "./tipos";
 const youtube = (q: string) =>
   `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
 
-const DICA_PAPELARIA = "👉 **Faça a cópia em uma papelaria próxima** usando o documento original. NÃO mande foto. NÃO mande PDF. Só vale entregue **impresso na mão** da Letícia.";
+const DICA_PAPELARIA = "👉 **Faça a cópia em uma papelaria próxima** usando o documento original.\n\n🚫 **PROIBIDO IMPRIMIR FOTO DE DOCUMENTO.** Tem que ser xerox de verdade, bem legível.";
 
 // ============================================================================
 // Fluxos reutilizáveis (Gov.br, certidões, bancos)
@@ -795,61 +795,49 @@ export const catalogoDocs: Record<string, DocCatalogo> = {
     },
   },
 
-  // Docs para moradores +18
-  m_contracheques: {
-    id: "m_contracheques",
-    nome: "Contracheques dos últimos 3 meses",
-    descricao: "",
+  imposto_renda: {
+    id: "imposto_renda",
+    nome: "Declaração de Imposto de Renda",
+    descricao: "Para autônomos que fizeram declaração de IR neste ano.",
     dicaCopia: DICA_PAPELARIA,
-    avisos: ["Os **3 últimos meses seguidos**."],
+    avisos: [
+      "Se você **não fez** declaração de IR este ano, **não precisa** desse documento — entregue só a **Declaração de Ausência de Renda Formal** (o próximo da lista).",
+      "É o **recibo de entrega da declaração** que a Receita Federal emite.",
+    ],
     fluxoInicial: "inicio",
     fluxos: {
       inicio: {
         id: "inicio",
+        ramificacao: {
+          pergunta: "Você fez declaração de Imposto de Renda este ano?",
+          opcoes: [
+            { label: "Sim, fiz", vaiPara: "sim" },
+            { label: "Não fiz", vaiPara: "nao" },
+          ],
+        },
+      },
+      sim: {
+        id: "sim",
+        titulo: "Pegar o recibo",
         passos: [
-          { emoji: "🏢", texto: "Peça ao RH da empresa onde essa pessoa trabalha." },
-          { emoji: "📧", texto: "Ou procure no e-mail dela por **'contracheque'** ou **'holerite'**." },
+          { emoji: "🌐", texto: "Entre no site da [Receita Federal — e-CAC](https://cav.receita.fazenda.gov.br)." },
+          { emoji: "🔑", texto: "Entre com sua conta **gov.br** (mesmo CPF e senha)." },
+          { emoji: "📑", texto: "Procure por **Meu Imposto de Renda** → **Extrato do Processamento** ou **Recibos de Entrega**." },
+          { emoji: "📲", texto: "Salve o recibo e mande pro seu WhatsApp." },
           { emoji: "🖨️", texto: "Imprima na papelaria." },
         ],
       },
-    },
-  },
-  m_extratos: {
-    id: "m_extratos",
-    nome: "Extratos bancários dos últimos 3 meses",
-    descricao: "",
-    dicaCopia: DICA_PAPELARIA,
-    avisos: ["De **TODAS as contas** dessa pessoa (corrente, poupança, conta digital)."],
-    fluxoInicial: "banco_inicio",
-    fluxos: fluxosExtratosBancarios,
-  },
-  m_ausencia_renda: {
-    id: "m_ausencia_renda",
-    nome: "Declaração de Ausência de Renda Formal",
-    descricao: "Para desempregados e autônomos.",
-    avisos: ["Preencher à mão e **assinar igual ao RG**."],
-    modeloHref: "/modelos/declaracao-ausencia-renda.pdf",
-    fluxoInicial: "inicio",
-    fluxos: {
-      inicio: {
-        id: "inicio",
+      nao: {
+        id: "nao",
+        intro: "Você não precisa desse documento.",
         passos: [
-          { emoji: "⬇️", texto: "Toque em **Baixar modelo**." },
-          { emoji: "📲", texto: "Mande pro WhatsApp e imprima na papelaria." },
-          { emoji: "✍️", texto: "A pessoa preenche à mão e **assina**." },
+          { emoji: "✅", texto: "Marque este documento como **feito** e entregue no lugar a **Declaração de Ausência de Renda Formal** (o próximo na lista)." },
         ],
       },
     },
   },
-  m_extrato_inss: {
-    id: "m_extrato_inss",
-    nome: "Extrato de benefício do INSS",
-    descricao: "Para aposentados ou pensionistas.",
-    dicaCopia: DICA_PAPELARIA,
-    avisos: ["Se essa pessoa não conseguir entrar, ligue **[135](tel:135)** — central do INSS."],
-    fluxoInicial: "inss_inicio",
-    fluxos: fluxosMeuInss,
-  },
+
+  // Documentos específicos por morador (MEI/empresário, sem equivalente no fluxo do herdeiro)
   m_mei_empresario: {
     id: "m_mei_empresario",
     nome: "Documentos de MEI ou empresário",

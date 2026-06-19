@@ -31,7 +31,7 @@ export default function DocPage() {
       </header>
 
       {doc.dicaCopia && (
-        <section className="rounded-lg border-2 border-blue-400 bg-blue-50 p-3 text-sm text-blue-900">
+        <section className="rounded-lg border-2 border-blue-400 bg-blue-50 p-3 text-sm text-blue-900 whitespace-pre-line">
           <FormattedText text={doc.dicaCopia} />
         </section>
       )}
